@@ -37,20 +37,24 @@ A lightweight, native macOS menu bar (system tray) application built for Apple S
   - Toggle individual websites or all websites with one click.
 - ⏱️ **Auto-Lock Productivity Timer**:
   - Option to automatically re-lock websites after 5 minutes, 15 minutes, 30 minutes, or 1 hour after unlocking with Touch ID.
+- 🚀 **Auto-Start on Login & Machine Restart**:
+  - Automatically launches whenever you log in or restart your Mac.
+  - Can be toggled on/off in the popover dashboard or right-click context menu.
+  - Setup script ensures `/etc/hosts` write access persists seamlessly across system restarts.
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. One-Time Setup for Instant Touch ID Unlocking
-To enable Touch ID to modify `/etc/hosts` instantly without prompting for your macOS administrator password every time, run the one-time permission setup:
+### 1. One-Time Setup for Touch ID & Auto-Start on Restart
+To enable Touch ID to modify `/etc/hosts` instantly and configure auto-start when you log in or after your machine restarts:
 
 ```bash
 make setup
 # OR: sudo ./scripts/setup-permissions.sh
 ```
 
-> **Note:** If you skip this step, the app will still work by prompting you with the standard macOS administrator dialog when modifying the hosts file.
+> **Note:** This configures `/etc/hosts` write permissions, enables Touch ID for sudo, installs a boot hook so permissions persist across macOS restarts, and registers the app to launch at login.
 
 ### 2. Build the Application
 ```bash
