@@ -18,7 +18,7 @@ A lightweight, native macOS menu bar (system tray) application built for Apple S
   - Automatically flushes macOS DNS cache (`dscacheutil -flushcache`) upon locking and unlocking.
   - **Non-destructive**: Preserves all existing `/etc/hosts` entries inside clean, demarcated markers (`# === BEGIN WEB-BLACKLIST MANAGED BLOCK ===`).
 - 🌐 **Built-in Social Network Presets (External JSON Config)**:
-  - Preset websites are defined in [`sites.json`](file:///Users/ducnguyen/Workspace/personal/web-blacklist/sites.json) (and `Resources/sites.json`), making them easily readable, editable, and customizable without touching Swift code!
+  - Preset websites are defined in [`Resources/sites.json`](file:///Users/ducnguyen/Workspace/personal/web-blacklist/Resources/sites.json), making them easily readable, editable, and customizable without touching Swift code!
   - Includes presets for:
     - Facebook & Messenger
     - Instagram
