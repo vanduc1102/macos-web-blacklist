@@ -13,6 +13,7 @@ public final class BlacklistStore: ObservableObject {
     @Published public var isHostsWritable: Bool = false
     @Published public var isTouchIDAvailable: Bool = false
     @Published public var isAuthenticating: Bool = false
+    @Published public var launchAtLogin: Bool = false
     @Published public var autoLockMinutes: Int = 0
     @Published public var remainingSeconds: Int = 0
     @Published public var errorMessage: String?
@@ -30,6 +31,7 @@ public final class BlacklistStore: ObservableObject {
     private init() {
         self.isTouchIDAvailable = TouchIDManager.shared.isBiometricAvailable
         self.isHostsWritable = HostsManager.shared.isHostsWritable
+        self.launchAtLogin = LaunchAtLoginManager.shared.isEnabled
         
         loadSavedSites()
         loadPreferences()
@@ -42,6 +44,22 @@ public final class BlacklistStore: ObservableObject {
     public func refreshHostsState() {
         self.isHostsWritable = HostsManager.shared.isHostsWritable
         self.isLocked = HostsManager.shared.isBlacklistActive()
+        self.launchAtLogin = LaunchAtLoginManager.shared.isEnabled
+    }
+    
+    public func toggleLaunchAtLogin() {
+        setLaunchAtLogin(!launchAtLogin)
+    }
+    
+    public func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            try LaunchAtLoginManager.shared.setEnabled(enabled)
+            self.launchAtLogin = LaunchAtLoginManager.shared.isEnabled
+            self.statusMessage = enabled ? "Auto-start at login enabled" : "Auto-start at login disabled"
+        } catch {
+            self.errorMessage = "Failed to update auto-start: \(error.localizedDescription)"
+            self.launchAtLogin = LaunchAtLoginManager.shared.isEnabled
+        }
     }
     
     // MARK: - Lock / Unlock Actions
