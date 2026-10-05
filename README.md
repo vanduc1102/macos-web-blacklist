@@ -17,19 +17,21 @@ A lightweight, native macOS menu bar (system tray) application built for Apple S
   - Null routes domains to `0.0.0.0` (IPv4) and `::1` (IPv6) with zero network latency.
   - Automatically flushes macOS DNS cache (`dscacheutil -flushcache`) upon locking and unlocking.
   - **Non-destructive**: Preserves all existing `/etc/hosts` entries inside clean, demarcated markers (`# === BEGIN WEB-BLACKLIST MANAGED BLOCK ===`).
-- 🌐 **Built-in Social Network Presets**:
-  - Facebook & Messenger
-  - Instagram
-  - Threads
-  - X (Twitter)
-  - TikTok
-  - YouTube
-  - Reddit
-  - LinkedIn
-  - Pinterest
-  - Twitch
-  - Discord
-  - Distraction news / classifieds sites (e.g. `vnexpress.net`, `genk.vn`, `chotot.com`)
+- 🌐 **Built-in Social Network Presets (External JSON Config)**:
+  - Preset websites are defined in [`sites.json`](file:///Users/ducnguyen/Workspace/personal/web-blacklist/sites.json) (and `Resources/sites.json`), making them easily readable, editable, and customizable without touching Swift code!
+  - Includes presets for:
+    - Facebook & Messenger
+    - Instagram
+    - Threads
+    - X (Twitter)
+    - TikTok
+    - YouTube
+    - Reddit
+    - LinkedIn
+    - Pinterest
+    - Twitch
+    - Discord
+    - Distraction news / classifieds sites (e.g. `vnexpress.net`, `genk.vn`, `chotot.com`)
 - ➕ **Custom Website Management**:
   - Add any domain or URL (automatically normalizes bare domains and handles `www.` subdomains).
   - Toggle individual websites or all websites with one click.

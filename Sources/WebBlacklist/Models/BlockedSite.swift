@@ -8,6 +8,15 @@ public struct BlockedSite: Identifiable, Codable, Equatable {
     public var isEnabled: Bool
     public var isCustom: Bool
     
+    enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case iconName
+        case domains
+        case isEnabled
+        case isCustom
+    }
+    
     public init(
         id: UUID = UUID(),
         name: String,
@@ -22,6 +31,16 @@ public struct BlockedSite: Identifiable, Codable, Equatable {
         self.domains = domains
         self.isEnabled = isEnabled
         self.isCustom = isCustom
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = (try? container.decode(UUID.self, forKey: .id)) ?? UUID()
+        self.name = try container.decode(String.self, forKey: .name)
+        self.iconName = (try? container.decode(String.self, forKey: .iconName)) ?? "globe"
+        self.domains = try container.decode([String].self, forKey: .domains)
+        self.isEnabled = (try? container.decode(Bool.self, forKey: .isEnabled)) ?? true
+        self.isCustom = (try? container.decode(Bool.self, forKey: .isCustom)) ?? false
     }
     
     /// Normalizes and cleans a domain/URL string into bare hostnames
@@ -64,7 +83,35 @@ public struct BlockedSite: Identifiable, Codable, Equatable {
         return Array(results).sorted()
     }
     
-    /// Default presets of popular social networks and entertainment services
+    /// Loads presets from JSON file (sites.json), with fallback to defaultPresets
+    public static func loadPresets() -> [BlockedSite] {
+        // 1. Try App Bundle resources
+        if let bundleUrl = Bundle.main.url(forResource: "sites", withExtension: "json"),
+           let data = try? Data(contentsOf: bundleUrl),
+           let sites = try? JSONDecoder().decode([BlockedSite].self, from: data) {
+            return sites
+        }
+        
+        // 2. Try common locations relative to working dir or bundle
+        let possiblePaths = [
+            "Resources/sites.json",
+            "sites.json",
+            Bundle.main.bundlePath + "/Contents/Resources/sites.json"
+        ]
+        
+        for path in possiblePaths {
+            let url = URL(fileURLWithPath: path)
+            if let data = try? Data(contentsOf: url),
+               let sites = try? JSONDecoder().decode([BlockedSite].self, from: data) {
+                return sites
+            }
+        }
+        
+        // 3. Fallback to built-in presets
+        return defaultPresets
+    }
+    
+    /// Default presets embedded in code as a fallback
     public static var defaultPresets: [BlockedSite] {
         [
             BlockedSite(

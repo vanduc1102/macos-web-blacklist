@@ -173,12 +173,12 @@ public final class BlacklistStore: ObservableObject {
     }
     
     public func resetToDefaults() {
-        sites = BlockedSite.defaultPresets
+        sites = BlockedSite.loadPresets()
         saveSites()
         if isLocked {
             try? HostsManager.shared.applyBlacklist(sites: sites)
         }
-        statusMessage = "Reset to default presets"
+        statusMessage = "Reset to presets from sites.json"
     }
     
     // MARK: - Auto-Lock Timer
@@ -255,7 +255,7 @@ public final class BlacklistStore: ObservableObject {
            !saved.isEmpty {
             self.sites = saved
         } else {
-            self.sites = BlockedSite.defaultPresets
+            self.sites = BlockedSite.loadPresets()
         }
     }
     
