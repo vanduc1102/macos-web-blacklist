@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import SwiftUI
+import LocalAuthentication
 
 @MainActor
 public final class BlacklistStore: ObservableObject {
@@ -79,10 +80,13 @@ public final class BlacklistStore: ObservableObject {
                         self.errorMessage = "Failed to unlock /etc/hosts: \(error.localizedDescription)"
                     }
                 case .failure(let error):
-                    // If user cancelled, don't show an intrusive error
                     let nsError = error as NSError
-                    if nsError.domain == "com.apple.LocalAuthentication" && nsError.code == -2 {
-                        // User cancelled
+                    // Don't show error banner if user voluntarily cancelled
+                    if nsError.domain == LAErrorDomain && (
+                        nsError.code == LAError.userCancel.rawValue ||
+                        nsError.code == LAError.appCancel.rawValue ||
+                        nsError.code == LAError.systemCancel.rawValue
+                    ) {
                         return
                     }
                     self.errorMessage = "Authentication failed: \(error.localizedDescription)"

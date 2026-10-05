@@ -96,7 +96,10 @@ public final class StatusBarController: NSObject {
         
         // Setup outside click monitor
         eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
-            self?.closePopover(nil)
+            guard let self = self else { return }
+            if !self.store.isAuthenticating {
+                self.closePopover(nil)
+            }
         }
     }
     

@@ -65,22 +65,13 @@ public final class HostsManager {
         return lines.joined(separator: "\n")
     }
     
-    /// Strips the Web-Blacklist block from existing hosts content
+    /// Strips all Web-Blacklist blocks from existing hosts content
     public func stripManagedBlock(from content: String) -> String {
-        guard let startIndex = content.range(of: beginMarker)?.lowerBound,
-              let endIndex = content.range(of: endMarker)?.upperBound else {
-            return content
-        }
-        
         var modified = content
-        let removalRange = startIndex..<endIndex
-        modified.removeSubrange(removalRange)
-        
-        // Clean up excessive trailing newlines
-        while modified.hasSuffix("\n\n\n") {
-            modified.removeLast()
+        while let startIndex = modified.range(of: beginMarker)?.lowerBound,
+              let endIndex = modified.range(of: endMarker)?.upperBound {
+            modified.removeSubrange(startIndex..<endIndex)
         }
-        
         return modified.trimmingCharacters(in: .whitespacesAndNewlines) + "\n"
     }
     
@@ -103,33 +94,64 @@ public final class HostsManager {
         flushDNS()
     }
     
-    /// Writes the content to `/etc/hosts`, either directly or using AppleScript administrator privileges
+    /// Writes the content to `/etc/hosts`, first trying direct POSIX write, then falling back to AppleScript
     private func writeHosts(content: String) throws {
-        if isHostsWritable {
-            // Write directly
-            try content.write(toFile: hostsPath, atomically: true, encoding: .utf8)
-        } else {
-            // Write via AppleScript administrator prompt
-            let tempFile = "/tmp/web_blacklist_\(UUID().uuidString).tmp"
-            try content.write(toFile: tempFile, atomically: true, encoding: .utf8)
-            defer {
-                try? FileManager.default.removeItem(atPath: tempFile)
+        do {
+            try writeDirectly(content: content)
+        } catch {
+            // Fallback to administrator privileges if direct write fails
+            try writeWithPrivileges(content: content)
+        }
+    }
+    
+    /// Direct POSIX truncate-and-write to avoid temp file creation in /etc (which causes CocoaError 513)
+    private func writeDirectly(content: String) throws {
+        guard let data = content.data(using: .utf8) else {
+            throw NSError(domain: "HostsManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to encode string as UTF-8"])
+        }
+        
+        let fd = open(hostsPath, O_WRONLY | O_TRUNC)
+        guard fd >= 0 else {
+            let errStr = String(cString: strerror(errno))
+            throw NSError(domain: "HostsManager", code: Int(errno), userInfo: [NSLocalizedDescriptionKey: "Cannot open \(hostsPath) for writing: \(errStr)"])
+        }
+        defer { close(fd) }
+        
+        try data.withUnsafeBytes { rawBuffer in
+            guard let ptr = rawBuffer.baseAddress else { return }
+            var totalWritten = 0
+            while totalWritten < data.count {
+                let written = write(fd, ptr.advanced(by: totalWritten), data.count - totalWritten)
+                if written < 0 {
+                    let errStr = String(cString: strerror(errno))
+                    throw NSError(domain: "HostsManager", code: Int(errno), userInfo: [NSLocalizedDescriptionKey: "Failed writing to \(hostsPath): \(errStr)"])
+                }
+                totalWritten += written
             }
-            
-            let script = "do shell script \"cp '\(tempFile)' '\(hostsPath)' && chmod 664 '\(hostsPath)' && chgrp admin '\(hostsPath)' && dscacheutil -flushcache\" with administrator privileges"
-            var errorInfo: NSDictionary?
-            let appleScript = NSAppleScript(source: script)
-            appleScript?.executeAndReturnError(&errorInfo)
-            
-            if let error = errorInfo {
-                let msg = error[NSAppleScript.errorMessage] as? String ?? "Failed to write /etc/hosts with administrator privileges"
-                throw NSError(domain: "HostsManager", code: 1, userInfo: [NSLocalizedDescriptionKey: msg])
-            }
+        }
+        fsync(fd)
+    }
+    
+    /// Fallback write using AppleScript administrator prompt
+    private func writeWithPrivileges(content: String) throws {
+        let tempFile = "/tmp/web_blacklist_\(UUID().uuidString).tmp"
+        try content.write(toFile: tempFile, atomically: false, encoding: .utf8)
+        defer {
+            try? FileManager.default.removeItem(atPath: tempFile)
+        }
+        
+        let script = "do shell script \"cp '\(tempFile)' '\(hostsPath)' && chmod 664 '\(hostsPath)' && chgrp admin '\(hostsPath)' && dscacheutil -flushcache\" with administrator privileges"
+        var errorInfo: NSDictionary?
+        let appleScript = NSAppleScript(source: script)
+        appleScript?.executeAndReturnError(&errorInfo)
+        
+        if let error = errorInfo {
+            let msg = error[NSAppleScript.errorMessage] as? String ?? "Failed to write /etc/hosts with administrator privileges"
+            throw NSError(domain: "HostsManager", code: 1, userInfo: [NSLocalizedDescriptionKey: msg])
         }
     }
     
     /// One-time setup to grant the admin group write permissions to `/etc/hosts`
-    /// This enables seamless Touch ID unlocking without requiring administrator password dialogs.
     public func grantDirectWritePermissions(completion: @escaping (Result<Void, Error>) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             let script = "do shell script \"chmod 664 /etc/hosts && chgrp admin /etc/hosts\" with administrator privileges"

@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 import LocalAuthentication
 
 public final class TouchIDManager {
@@ -6,38 +7,33 @@ public final class TouchIDManager {
     
     private init() {}
     
-    /// Checks if Touch ID (biometric authentication) is available on this Mac
+    /// Checks if biometric authentication (Touch ID) is supported and enrolled
     public var isBiometricAvailable: Bool {
         let context = LAContext()
         var error: NSError?
         return context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
     }
     
-    /// Performs biometric authentication with fallback to Mac passcode
+    /// Performs Touch ID authentication with passcode fallback
     public func authenticate(
-        reason: String = "Authenticate with Touch ID to unlock Web Blacklist",
+        reason: String = "Touch ID to unlock Web Blacklist and access sites",
         completion: @escaping (Result<Void, Error>) -> Void
     ) {
+        // Ensure the application is active and key so the Touch ID prompt is presented
+        DispatchQueue.main.async {
+            NSApp.activate(ignoringOtherApps: true)
+        }
+        
         let context = LAContext()
         context.localizedCancelTitle = "Cancel"
         
         var authError: NSError?
         
-        // Prefer biometric authentication
-        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &authError) {
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, error in
-                DispatchQueue.main.async {
-                    if success {
-                        completion(.success(()))
-                    } else {
-                        let err = error ?? NSError(domain: "TouchID", code: -1, userInfo: [NSLocalizedDescriptionKey: "Authentication failed"])
-                        completion(.failure(err))
-                    }
-                }
-            }
-        } else if context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &authError) {
-            // Fallback to device passcode/password
-            context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, error in
+        // Use deviceOwnerAuthentication which prompts Touch ID first, but also provides passcode fallback
+        let policy: LAPolicy = .deviceOwnerAuthentication
+        
+        if context.canEvaluatePolicy(policy, error: &authError) {
+            context.evaluatePolicy(policy, localizedReason: reason) { success, error in
                 DispatchQueue.main.async {
                     if success {
                         completion(.success(()))
@@ -49,7 +45,9 @@ public final class TouchIDManager {
             }
         } else {
             let err = authError ?? NSError(domain: "TouchID", code: -2, userInfo: [NSLocalizedDescriptionKey: "Authentication not supported on this device"])
-            completion(.failure(err))
+            DispatchQueue.main.async {
+                completion(.failure(err))
+            }
         }
     }
 }
