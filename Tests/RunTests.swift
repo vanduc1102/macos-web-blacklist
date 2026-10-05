@@ -14,7 +14,12 @@ struct RunTests {
         assert(d2.contains("instagram.com"), "Failed to extract apex instagram.com")
         assert(d2.contains("www.instagram.com"), "Failed to preserve www.instagram.com")
         
-        // 2. Hosts block generation
+        // 2. JSON preset loading
+        let loaded = BlockedSite.loadPresets()
+        assert(!loaded.isEmpty, "Presets loaded from sites.json must not be empty")
+        assert(loaded.contains(where: { $0.name.contains("Facebook") }), "Must contain Facebook")
+        
+        // 3. Hosts block generation
         let site = BlockedSite(
             name: "Meta",
             domains: ["facebook.com", "instagram.com"],

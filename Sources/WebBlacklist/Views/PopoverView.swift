@@ -80,6 +80,9 @@ public struct PopoverView: View {
                     
                     // Auto-Lock Settings
                     autoLockSection
+                    
+                    // Auto-start at Login Settings
+                    launchAtLoginSection
                 }
                 .padding(14)
             }
@@ -254,6 +257,28 @@ public struct PopoverView: View {
             .pickerStyle(.menu)
             .controlSize(.small)
             .frame(width: 95)
+        }
+    }
+    
+    private var launchAtLoginSection: some View {
+        HStack {
+            Image(systemName: "power.circle.fill")
+                .font(.system(size: 13))
+                .foregroundColor(.secondary)
+            
+            Text("Launch at Login / Restart:")
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            Toggle("", isOn: Binding(
+                get: { store.launchAtLogin },
+                set: { store.setLaunchAtLogin($0) }
+            ))
+            .toggleStyle(.switch)
+            .controlSize(.mini)
+            .labelsHidden()
         }
     }
     

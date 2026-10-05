@@ -141,6 +141,11 @@ public final class StatusBarController: NSObject {
         openItem.target = self
         menu.addItem(openItem)
         
+        let launchItem = NSMenuItem(title: "Launch at Login", action: #selector(contextToggleLaunchAtLogin), keyEquivalent: "")
+        launchItem.target = self
+        launchItem.state = store.launchAtLogin ? .on : .off
+        menu.addItem(launchItem)
+        
         menu.addItem(NSMenuItem.separator())
         
         let quitItem = NSMenuItem(title: "Quit Web Blacklist", action: #selector(contextQuit), keyEquivalent: "q")
@@ -162,6 +167,10 @@ public final class StatusBarController: NSObject {
     
     @objc private func contextFlushDNS() {
         store.flushDNS()
+    }
+    
+    @objc private func contextToggleLaunchAtLogin() {
+        store.toggleLaunchAtLogin()
     }
     
     @objc private func contextOpenDashboard() {

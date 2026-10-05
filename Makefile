@@ -9,14 +9,17 @@ install: build
 	@echo "Installing WebBlacklist.app to /Applications..."
 	@rm -rf /Applications/WebBlacklist.app
 	@cp -R WebBlacklist.app /Applications/
-	@echo "✅ Installed to /Applications/WebBlacklist.app"
+	@echo "Registering auto-start on login / restart..."
+	@osascript -e 'tell application "System Events" to delete (every login item whose name is "Web Blacklist")' 2>/dev/null || true
+	@osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/WebBlacklist.app", hidden:false, name:"Web Blacklist"}' 2>/dev/null || true
+	@echo "✅ Installed to /Applications/WebBlacklist.app and configured to auto-start on login/restart"
 
 run: build
 	@echo "Launching WebBlacklist.app..."
 	@open WebBlacklist.app
 
 setup:
-	@echo "Setting up /etc/hosts write permissions for Touch ID..."
+	@echo "Setting up app permissions and auto-start on login / restart..."
 	@sudo ./scripts/setup-permissions.sh
 
 test:

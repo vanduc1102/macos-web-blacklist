@@ -35,6 +35,11 @@ if [ -f "Resources/AppIcon.icns" ]; then
     cp "Resources/AppIcon.icns" "$RESOURCES/AppIcon.icns"
 fi
 
+# Copy sites.json if exists
+if [ -f "Resources/sites.json" ]; then
+    cp "Resources/sites.json" "$RESOURCES/sites.json"
+fi
+
 # Ad-hoc sign the bundle
 echo "✍️  Ad-hoc code signing $APP_BUNDLE..."
 codesign --force --deep --sign - "$APP_BUNDLE"
