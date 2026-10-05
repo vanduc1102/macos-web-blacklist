@@ -1,0 +1,32 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: pr-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Test & Build Check
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Tests
+        run: make test
+
+      - name: Build macOS Application Bundle
+        run: make build
+
+      - name: Verify App Bundle Structure
+        run: |
+          test -d WebBlacklist.app
+          test -x WebBlacklist.app/Contents/MacOS/WebBlacklist
+          test -f WebBlacklist.app/Contents/Info.plist
+          echo "✅ WebBlacklist.app bundle verified successfully!"

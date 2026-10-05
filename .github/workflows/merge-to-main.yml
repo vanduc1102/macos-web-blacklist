@@ -1,0 +1,39 @@
+name: Merge to Main
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: main-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build & Archive Main
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Tests
+        run: make test
+
+      - name: Build macOS Application Bundle
+        run: make build
+
+      - name: Archive Application Bundle
+        run: |
+          zip -r WebBlacklist-nightly.zip WebBlacklist.app
+          shasum -a 256 WebBlacklist-nightly.zip > WebBlacklist-nightly.zip.sha256
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebBlacklist-nightly
+          path: |
+            WebBlacklist-nightly.zip
+            WebBlacklist-nightly.zip.sha256
+          retention-days: 14
