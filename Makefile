@@ -1,9 +1,12 @@
-.PHONY: all build install run setup test clean
+.PHONY: all build dmg install run setup test clean
 
 all: build
 
 build:
 	@./scripts/build-app.sh
+
+dmg: build
+	@./scripts/build-dmg.sh
 
 install: build
 	@echo "Installing WebBlacklist.app to /Applications..."
@@ -27,5 +30,5 @@ test:
 	@swiftc -parse-as-library Sources/WebBlacklist/Models/BlockedSite.swift Sources/WebBlacklist/Services/HostsManager.swift Tests/RunTests.swift -o /tmp/run_tests && /tmp/run_tests && rm /tmp/run_tests
 
 clean:
-	@rm -rf .build WebBlacklist.app
+	@rm -rf .build WebBlacklist.app WebBlacklist.dmg *.dmg *.zip *.sha256
 	@echo "Cleaned build artifacts."

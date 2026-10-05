@@ -40,9 +40,14 @@ jobs:
           zip -r "$ZIP_NAME" WebBlacklist.app
           shasum -a 256 "$ZIP_NAME" > "${ZIP_NAME}.sha256"
           
+          DMG_NAME="WebBlacklist-${TAG}.dmg"
+          ./scripts/build-dmg.sh "$DMG_NAME"
+          shasum -a 256 "$DMG_NAME" > "${DMG_NAME}.sha256"
+          
           echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
           echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
-          echo "📦 Created $ZIP_NAME and checksum file"
+          echo "DMG_NAME=$DMG_NAME" >> $GITHUB_ENV
+          echo "📦 Created $ZIP_NAME, $DMG_NAME and checksum files"
 
       - name: Upload Assets to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -51,14 +56,18 @@ jobs:
           files: |
             ${{ env.ZIP_NAME }}
             ${{ env.ZIP_NAME }}.sha256
+            ${{ env.DMG_NAME }}
+            ${{ env.DMG_NAME }}.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Workflow Artifact (Backup)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ZIP_NAME }}
+          name: WebBlacklist-${{ env.RELEASE_TAG }}
           path: |
             ${{ env.ZIP_NAME }}
             ${{ env.ZIP_NAME }}.sha256
+            ${{ env.DMG_NAME }}
+            ${{ env.DMG_NAME }}.sha256
           retention-days: 30

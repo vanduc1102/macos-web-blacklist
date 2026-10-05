@@ -43,6 +43,18 @@ public struct AddSiteView: View {
                 
                 Spacer()
                 
+                Button(action: {
+                    store.importSitesFromFile()
+                }) {
+                    HStack(spacing: 3) {
+                        Image(systemName: "square.and.arrow.down")
+                        Text("Import File...")
+                    }
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .help("Import websites from a JSON or TXT file")
+                
                 Button("Add Site") {
                     let domain = store.newSiteDomain.trimmingCharacters(in: .whitespacesAndNewlines)
                     guard !domain.isEmpty else { return }

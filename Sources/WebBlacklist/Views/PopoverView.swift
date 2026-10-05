@@ -283,37 +283,71 @@ public struct PopoverView: View {
     }
     
     private var footerSection: some View {
-        HStack {
-            Button(action: {
-                store.flushDNS()
-            }) {
-                HStack(spacing: 3) {
-                    Image(systemName: "arrow.clockwise")
-                    Text("Flush DNS")
-                }
-                .font(.system(size: 11))
-            }
-            .buttonStyle(.borderless)
-            .help("Force flush macOS DNS resolver cache")
-            
-            Spacer()
-            
-            Button(action: {
-                store.resetToDefaults()
-            }) {
-                Text("Reset Presets")
+        VStack(spacing: 8) {
+            HStack {
+                Button(action: {
+                    store.importSitesFromFile()
+                }) {
+                    HStack(spacing: 3) {
+                        Image(systemName: "square.and.arrow.down")
+                        Text("Import")
+                    }
                     .font(.system(size: 11))
+                }
+                .buttonStyle(.borderless)
+                .help("Import websites from a JSON or text file")
+                
+                Spacer()
+                
+                Button(action: {
+                    store.exportSitesToFile()
+                }) {
+                    HStack(spacing: 3) {
+                        Image(systemName: "square.and.arrow.up")
+                        Text("Export")
+                    }
+                    .font(.system(size: 11))
+                }
+                .buttonStyle(.borderless)
+                .help("Export website blacklist to JSON file")
+                
+                Spacer()
+                
+                Button(action: {
+                    store.flushDNS()
+                }) {
+                    HStack(spacing: 3) {
+                        Image(systemName: "arrow.clockwise")
+                        Text("Flush DNS")
+                    }
+                    .font(.system(size: 11))
+                }
+                .buttonStyle(.borderless)
+                .help("Force flush macOS DNS resolver cache")
             }
-            .buttonStyle(.borderless)
             
-            Spacer()
+            Divider()
             
-            Button("Quit") {
-                NSApplication.shared.terminate(nil)
+            HStack {
+                Button(action: {
+                    store.resetToDefaults()
+                }) {
+                    Text("Reset Presets")
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.borderless)
+                .help("Reset back to default sites preset")
+                
+                Spacer()
+                
+                Button("Quit") {
+                    NSApplication.shared.terminate(nil)
+                }
+                .buttonStyle(.borderless)
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
             }
-            .buttonStyle(.borderless)
-            .font(.system(size: 11))
-            .foregroundColor(.secondary)
         }
     }
 }
