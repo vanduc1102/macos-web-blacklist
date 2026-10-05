@@ -118,3 +118,4 @@ This compiles a release arm64 binary and bundles it into `WebBlacklist.app`.
 
 ## 📄 License
 MIT License
+# macos-web-blacklist
