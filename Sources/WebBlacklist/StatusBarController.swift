@@ -97,7 +97,7 @@ public final class StatusBarController: NSObject {
         // Setup outside click monitor
         eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
             guard let self = self else { return }
-            if !self.store.isAuthenticating {
+            if !self.store.isAuthenticating && !self.store.isShowingFileDialog {
                 self.closePopover(nil)
             }
         }
@@ -133,6 +133,14 @@ public final class StatusBarController: NSObject {
         
         menu.addItem(NSMenuItem.separator())
         
+        let importItem = NSMenuItem(title: "Import Websites...", action: #selector(contextImportSites), keyEquivalent: "i")
+        importItem.target = self
+        menu.addItem(importItem)
+        
+        let exportItem = NSMenuItem(title: "Export Websites...", action: #selector(contextExportSites), keyEquivalent: "e")
+        exportItem.target = self
+        menu.addItem(exportItem)
+        
         let flushItem = NSMenuItem(title: "Flush DNS Cache", action: #selector(contextFlushDNS), keyEquivalent: "")
         flushItem.target = self
         menu.addItem(flushItem)
@@ -163,6 +171,14 @@ public final class StatusBarController: NSObject {
     
     @objc private func contextLock() {
         store.lock()
+    }
+    
+    @objc private func contextImportSites() {
+        store.importSitesFromFile()
+    }
+    
+    @objc private func contextExportSites() {
+        store.exportSitesToFile()
     }
     
     @objc private func contextFlushDNS() {

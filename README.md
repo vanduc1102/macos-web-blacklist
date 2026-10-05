@@ -35,6 +35,11 @@ A lightweight, native macOS menu bar (system tray) application built for Apple S
 - ➕ **Custom Website Management**:
   - Add any domain or URL (automatically normalizes bare domains and handles `www.` subdomains).
   - Toggle individual websites or all websites with one click.
+- 💾 **Export & Import Website Lists**:
+  - **Export**: Backup your blocked sites list to a formatted JSON file with one click.
+  - **Import**: Easily import website lists from JSON backups, string arrays, or plain-text domain/hosts files.
+  - **Smart Merge or Replace**: Prompts whether to safely merge new websites with your existing presets or replace the list entirely.
+  - Accessible directly in the popover dashboard, the "Add Site" drawer, and the right-click menu bar context menu.
 - ⏱️ **Auto-Lock Productivity Timer**:
   - Option to automatically re-lock websites after 5 minutes, 15 minutes, 30 minutes, or 1 hour after unlocking with Touch ID.
 - 🚀 **Auto-Start on Login & Machine Restart**:
@@ -56,12 +61,16 @@ make setup
 
 > **Note:** This configures `/etc/hosts` write permissions, enables Touch ID for sudo, installs a boot hook so permissions persist across macOS restarts, and registers the app to launch at login.
 
-### 2. Build the Application
-```bash
-make build
-```
-
-This compiles a release arm64 binary and bundles it into `WebBlacklist.app`.
+### 2. Build the Application or DMG
+- **Build App Bundle**:
+  ```bash
+  make build
+  ```
+- **Build DMG Installer**:
+  ```bash
+  make dmg
+  ```
+  This creates a distributable `WebBlacklist.dmg` disk image.
 
 ### 3. Launch or Install
 - **Run directly**:
@@ -69,9 +78,34 @@ This compiles a release arm64 binary and bundles it into `WebBlacklist.app`.
   make run
   # OR: open WebBlacklist.app
   ```
-- **Install to `/Applications`**:
+- **Install to `/Applications` via Makefile**:
   ```bash
   make install
+  ```
+
+---
+
+## 🛡️ Resolving the macOS Gatekeeper Warning
+
+When downloading `WebBlacklist.dmg` or `WebBlacklist.zip` from GitHub Releases, macOS attaches a quarantine attribute to downloaded files. Because this is an open-source project without a paid Apple Developer ID certificate ($99/year), macOS may display:
+
+> **"Apple could not verify 'WebBlacklist' is free of malware that may harm your Mac or compromise your privacy."**
+
+To allow macOS to open Web Blacklist (only required on the first launch):
+
+- **Method 1 (Right-click Open - Recommended)**:
+  1. Open your `/Applications` folder in Finder.
+  2. **Right-click** (or Control-click) `WebBlacklist.app` and choose **Open**.
+  3. Click **Open** on the confirmation dialog. macOS will remember your permission permanently.
+
+- **Method 2 (System Settings)**:
+  1. Open **System Settings** -> **Privacy & Security**.
+  2. Scroll down to the **Security** section.
+  3. Click **"Open Anyway"** next to the WebBlacklist prompt.
+
+- **Method 3 (Terminal One-Liner)**:
+  ```bash
+  xattr -cr /Applications/WebBlacklist.app
   ```
 
 ---
