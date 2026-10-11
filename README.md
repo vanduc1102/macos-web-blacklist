@@ -49,6 +49,15 @@ A lightweight, native macOS menu bar (system tray) application built for Apple S
 
 ---
 
+## 📸 Screenshots
+
+| Locked State | Unlocked State |
+|:---:|:---:|
+| ![Locked — Distracting websites blocked](docs/screenshots/Screenshot%202026-10-11%20at%2014-14-42.jpg) | ![Unlocked — Websites currently accessible](docs/screenshots/Screenshot%202026-10-11%20at%2014-14-27.jpg) |
+| Websites are blocked at system level. Tap **Unlock with Touch ID** to regain access. | Websites are accessible. Tap **Lock Blacklist Now** to block them again. |
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. One-Time Setup for Touch ID & Auto-Start on Restart
