@@ -4,18 +4,30 @@
       "facebook.com",
       "www.facebook.com",
       "m.facebook.com",
+      "web.facebook.com",
       "fb.com",
       "www.fb.com",
-      "messenger.com",
-      "www.messenger.com",
-      "static.xx.fbcdn.net",
       "connect.facebook.net"
     ],
-    "iconName" : "bubble.left.and.bubble.right.fill",
+    "iconName" : "f.cursive.circle.fill",
     "id" : "9F9F1960-09DA-475E-800F-ADCEFE626AEA",
     "isCustom" : false,
     "isEnabled" : true,
-    "name" : "Facebook & Messenger"
+    "name" : "Facebook"
+  },
+  {
+    "domains" : [
+      "messenger.com",
+      "www.messenger.com",
+      "m.me",
+      "www.m.me",
+      "edge-chat.messenger.com"
+    ],
+    "iconName" : "bubble.left.and.bubble.right.fill",
+    "id" : "7AAABAA7-8A9A-4337-BA9B-A0D51D2BFAAF",
+    "isCustom" : false,
+    "isEnabled" : true,
+    "name" : "Messenger"
   },
   {
     "domains" : [
