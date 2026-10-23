@@ -20,7 +20,8 @@ A lightweight, native macOS menu bar (system tray) application built for Apple S
 - 🌐 **Built-in Social Network Presets (External JSON Config)**:
   - Preset websites are defined in [`Resources/sites.json`](file:///Users/ducnguyen/Workspace/personal/web-blacklist/Resources/sites.json), making them easily readable, editable, and customizable without touching Swift code!
   - Includes presets for:
-    - Facebook & Messenger
+    - Facebook
+    - Messenger
     - Instagram
     - Threads
     - X (Twitter)

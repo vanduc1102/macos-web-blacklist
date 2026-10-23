@@ -146,11 +146,22 @@ public struct BlockedSite: Identifiable, Codable, Equatable {
     public static var defaultPresets: [BlockedSite] {
         [
             BlockedSite(
-                name: "Facebook & Messenger",
+                id: UUID(uuidString: "9F9F1960-09DA-475E-800F-ADCEFE626AEA") ?? UUID(),
+                name: "Facebook",
+                iconName: "f.cursive.circle.fill",
+                domains: [
+                    "facebook.com", "www.facebook.com", "m.facebook.com", "web.facebook.com", "fb.com", "www.fb.com",
+                    "connect.facebook.net"
+                ],
+                isEnabled: true,
+                isCustom: false
+            ),
+            BlockedSite(
+                id: UUID(uuidString: "7AAABAA7-8A9A-4337-BA9B-A0D51D2BFAAF") ?? UUID(),
+                name: "Messenger",
                 iconName: "bubble.left.and.bubble.right.fill",
                 domains: [
-                    "facebook.com", "www.facebook.com", "m.facebook.com", "fb.com", "www.fb.com",
-                    "messenger.com", "www.messenger.com", "static.xx.fbcdn.net", "connect.facebook.net"
+                    "messenger.com", "www.messenger.com", "m.me", "www.m.me", "edge-chat.messenger.com"
                 ],
                 isEnabled: true,
                 isCustom: false

@@ -388,10 +388,52 @@ public final class BlacklistStore: ObservableObject {
         if let data = UserDefaults.standard.data(forKey: sitesStorageKey),
            let saved = try? JSONDecoder().decode([BlockedSite].self, from: data),
            !saved.isEmpty {
-            self.sites = saved
+            let migrated = migrateSitesIfNeeded(saved)
+            self.sites = migrated
+            if migrated != saved {
+                saveSites()
+            }
         } else {
             self.sites = BlockedSite.loadPresets()
         }
+    }
+    
+    private func migrateSitesIfNeeded(_ loadedSites: [BlockedSite]) -> [BlockedSite] {
+        var result: [BlockedSite] = []
+        var didMigrate = false
+        
+        for site in loadedSites {
+            if site.name == "Facebook & Messenger" || (site.domains.contains("facebook.com") && site.domains.contains("messenger.com")) {
+                didMigrate = true
+                let fb = BlockedSite(
+                    id: site.id,
+                    name: "Facebook",
+                    iconName: "f.cursive.circle.fill",
+                    domains: [
+                        "facebook.com", "www.facebook.com", "m.facebook.com", "web.facebook.com", "fb.com", "www.fb.com",
+                        "connect.facebook.net"
+                    ],
+                    isEnabled: site.isEnabled,
+                    isCustom: site.isCustom
+                )
+                let messenger = BlockedSite(
+                    id: UUID(uuidString: "7AAABAA7-8A9A-4337-BA9B-A0D51D2BFAAF") ?? UUID(),
+                    name: "Messenger",
+                    iconName: "bubble.left.and.bubble.right.fill",
+                    domains: [
+                        "messenger.com", "www.messenger.com", "m.me", "www.m.me", "edge-chat.messenger.com"
+                    ],
+                    isEnabled: site.isEnabled,
+                    isCustom: site.isCustom
+                )
+                result.append(fb)
+                result.append(messenger)
+            } else {
+                result.append(site)
+            }
+        }
+        
+        return didMigrate ? result : loadedSites
     }
     
     private func loadPreferences() {

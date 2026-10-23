@@ -17,7 +17,17 @@ struct RunTests {
         // 2. JSON preset loading
         let loaded = BlockedSite.loadPresets()
         assert(!loaded.isEmpty, "Presets loaded from sites.json must not be empty")
-        assert(loaded.contains(where: { $0.name.contains("Facebook") }), "Must contain Facebook")
+        assert(loaded.contains(where: { $0.name == "Facebook" }), "Must contain Facebook")
+        assert(loaded.contains(where: { $0.name == "Messenger" }), "Must contain Messenger")
+        assert(!loaded.contains(where: { $0.name == "Facebook & Messenger" }), "Must not contain combined Facebook & Messenger")
+        
+        let fbSite = loaded.first(where: { $0.name == "Facebook" })!
+        assert(!fbSite.domains.contains("messenger.com"), "Facebook domains must not contain messenger.com")
+        assert(fbSite.domains.contains("facebook.com"), "Facebook domains must contain facebook.com")
+        
+        let messengerSite = loaded.first(where: { $0.name == "Messenger" })!
+        assert(messengerSite.domains.contains("messenger.com"), "Messenger domains must contain messenger.com")
+        assert(!messengerSite.domains.contains("facebook.com"), "Messenger domains must not contain facebook.com")
         
         // 3. Hosts block generation
         let site = BlockedSite(
